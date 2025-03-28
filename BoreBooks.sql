@@ -1,13 +1,11 @@
 select b.title, b.author
 from books b
-join (
-    select title, author, language from editions
-    join
-    select title, author, alt_languages from editions
-) as langs 
-on b.title = langs.title and b.author = langs.author
-join copies c on c.isbn = langs.isbn
-left join loans l on c.signature = l.signature
-where l.signature is null
+join  editions e 
+on b.title = e.title and b.author = e.author
+join copies c on c.isbn = e.isbn
+where not exists (
+    select * from loans l
+    where l.signature in (select c1.signature from copies c1 where c1.isbn = e.isbn)
+)
 group by b.title, b.author
-having count(langs.language) >= 3;
+having count(distinct e.language) >= 3;
