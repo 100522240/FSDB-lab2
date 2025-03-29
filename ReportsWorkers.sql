@@ -22,12 +22,12 @@ count(distinct a.taskdate) /
     end as num_stops_per_year,
 /*For calculating the number of loans per year we have to do the same thing as with the number of stops, but
 instead of counting the taskdates, we will count the signatures*/
-count(distinct case when l.return is null then l.signature else null end) /
+count(distinct l.signature) /
     case
         when floor((max(nvl(a.taskdate, sysdate)) - min(nvl(a.taskdate, sysdate))) / 365) != 0 then
         floor((max(nvl(a.taskdate, sysdate)) - min(a.taskdate)) / 365)
         else 1
-    end as num_unreturned_loans_per_year,
+    end as num_loans_per_active_year,
 /*To obtain the percentage of unreturned loans we have to count those that have null in the return column and then divide by the number of loans, and then multiply by 100*/
 round(
     case 
