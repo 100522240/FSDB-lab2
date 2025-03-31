@@ -10,7 +10,11 @@ floor((nvl(d.cont_end, sysdate) - d.cont_start) / 365) as seniority_contracted,
 /*To obtain the active years, we have taken into account the differnece between taskdates (columnn from assign_drv table).
 If a driver has null taskdates, then we replace them with the actual date. If they have more, we will obtain the earliest and latest taskdates
 and we then substract them to obtain the number of days and finally divide by 365*/ 
-floor((max(nvl(a.taskdate, sysdate)) - nvl(min(a.taskdate), sysdate)) / 365) as active_years,
+case 
+    when floor((max(nvl(a.taskdate, sysdate)) - nvl(min(a.taskdate), sysdate)) / 365) != 0 then
+    end floor((max(nvl(a.taskdate, sysdate)) - nvl(min(a.taskdate), sysdate)) / 365)
+    else 1
+    as active_years,
 /*To obtain the number of stops per active year we have to count the number of not null taskdates assigned to the driver
 and then divide it by the number of active years. In case that the active years is 0, we would get an error. Thus we have made a case statement where will divide the 
 taskdates by the number of active years if it is different than zero, otherwise, we will divide by one*/
