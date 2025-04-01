@@ -233,7 +233,7 @@ create or replace package body foundicu as
     end insert_reservation;
 
     --Complete description of record books retired procedure
-     procedure record_books_ret(input_siganture char) is
+     procedure record_books_ret(input_signature char) is
         --Declaration of local variables
         v_user_id char(10);
         v_user_count number;
