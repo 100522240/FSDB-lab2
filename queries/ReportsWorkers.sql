@@ -14,7 +14,7 @@ case
     when floor((max(nvl(a.taskdate, sysdate)) - nvl(min(a.taskdate), sysdate)) / 365) != 0 then
     floor((max(nvl(a.taskdate, sysdate)) - nvl(min(a.taskdate), sysdate)) / 365)
     else 1
-    as active_years,
+    end as active_years,
 /*To obtain the number of stops per active year we have to count the number of not null taskdates assigned to the driver
 and then divide it by the number of active years. In case that the active years is 0, we would get an error. Thus we have made a case statement where will divide the 
 taskdates by the number of active years if it is different than zero, otherwise, we will divide by one*/
