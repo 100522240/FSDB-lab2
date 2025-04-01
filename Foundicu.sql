@@ -2,7 +2,7 @@
 create or replace package foundicu as 
     procedure insert_loan(l_signature char);
     procedure insert_reservation(isbn_input varchar2,res_date date);
-    procedure record_books_ret(in_siganture char);
+    procedure record_books_ret(input_siganture char);
 
     current_user varchar2(10);
     procedure set_current_user(p_user varchar2);
@@ -183,7 +183,7 @@ create or replace package body foundicu as
         from copies 
         where isbn = isbn_input;
 
-        if v_isbn_count then
+        if v_isbn_count = 0 then
             raise_application_error(-20010, 'There is not a copy with the provided isbn');
         end if;
 
@@ -233,7 +233,7 @@ create or replace package body foundicu as
     end insert_reservation;
 
     --Complete description of record books retired procedure
-     procedure record_books_ret(in_siganture char) is
+     procedure record_books_ret(input_siganture char) is
         --Declaration of local variables
         v_user_id char(10);
         v_user_count number;
@@ -253,7 +253,7 @@ create or replace package body foundicu as
         --Check if the user has loaned the book with signature provided
         select count(*) into v_loans_count
         from loans
-        where signature = in_signature and user_id = current_user;
+        where signature = input_signature and user_id = current_user;
 
         if v_loans_count = 0 then
           raise_application_error(-20014, 'There are no loans for the given copy made by the user');
