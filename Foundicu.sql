@@ -2,11 +2,11 @@
 create or replace package foundicu as 
     procedure insert_loan(l_signature char);
     procedure insert_reservation(isbn_input varchar2,res_date date);
-    procedure record_books_ret(siganture char);
+    procedure record_books_ret(in_siganture char);
 
-    current_user VARCHAR2(10);
-    PROCEDURE set_current_user(p_user IN VARCHAR2);
-    FUNCTION get_current_user RETURN VARCHAR2;
+    current_user varchar2(10);
+    procedure set_current_user(p_user varchar2);
+    function get_current_user return varchar2;
 end;
 /
 
@@ -34,7 +34,7 @@ create or replace package body foundicu as
 
         begin
             --Count how many times the user's id is in the table users. If count is 0, raise an exception
-            select count(*) into v_user_count from users where user_id = user;
+            select count(*) into v_user_count from users where user_id = current_user;
             if v_user_count = 0 then
                 raise_application_error(-20001, 'Current user not found');
             else
@@ -44,7 +44,7 @@ create or replace package body foundicu as
             --Store the id of the user and the banned date (if it exists) in local varaibles
             select user_id, ban_up2 into v_user_id, v_ban_up2
             from users
-            where user_id = user;
+            where user_id = current_user;
 
             --Check if there is a reservation for that user
             select count(*) into v_reservation_count 
@@ -151,7 +151,7 @@ create or replace package body foundicu as
         --First insert into a local variable the number of times a user appears in table users
         select count(*) into v_user_counter
         from users
-        where user_id = user;
+        where user_id = current_user;
 
         --If v_user_count is 0 then raise a mistake. The user is not in the database
         if v_user_counter = 0 then
@@ -160,13 +160,13 @@ create or replace package body foundicu as
 
         select user_id, ban_up2 into v_user_id, v_ban_up2
         from users
-        where user_id = user;
+        where user_id = current_user;
     
 
         --Obtain the number of borrowed copies the user has
         select count(*) into v_borrow_count
         from loans
-        where user_id = user;
+        where user_id = v_user_id;
 
         --Check the number of borrowed copies has not surpassed the limit
         if v_borrow_count > 2 then
@@ -230,16 +230,53 @@ create or replace package body foundicu as
         values (v_signature, v_user_id, v_taskdate, v_user_town, v_user_province, 'R', v_time);
     end insert_reservation;
 
+    --Complete description of record books retired procedure
+    procedure record_books_ret(in_signature char) is
+        --Declaration of local variables
+        v_user_id char(10);
+        v_user_count number;
+        v_loans_count number;
+        
+        
+        --Count if user is in users table
+        select count(*) into v_user_count
+        from users
+        where user_id = current_user;
+
+        --If v_user_count is 0 then raise an error
+        if v_user_count = 0 then
+          raise_application_error(-20013, 'Current user not found')
+        end if;
+
+        --Check if the user has loaned the book with signature provided
+        select count(*) into v_loans_count
+        from loans
+        where signature = in_signature and user_id = current_user;
+
+        if v_loans_count = 0 then
+          raise_application_error(-20014, 'There are no loans for the given copy made by the user')
+        end if;
+
+        update loans
+        set return = sysdate
+        where signature = in_signature and user_id = current_user;
+
+
     -- Replace current user 
-    PROCEDURE set_current_user(p_user IN VARCHAR2) IS
-        BEGIN current_user := p_user; END;
+    procedure set_current_user(p_user varchar2) is
+        begin current_user := p_user; 
+        end set_current_user;
     
     -- Retrieve current user
-    FUNCTION get_current_user RETURN VARCHAR2 IS BEGIN 
+    function get_current_user return varchar2 is begin 
         -- If no user is manually defined, use the predefined one
-        if current_user is NULL then
-            return USER;
+        if current_user is null then
+            return user;
         else 
-            RETURN current_user;
+            return current_user;
         end if;    
-    END get_current_user;
+    end get_current_user;
+end foundicu;
+/
+
+
