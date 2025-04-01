@@ -153,6 +153,9 @@ create or replace package body foundicu as
             raise_application_error(-20008, 'The user has reached the borrow limit');
         end if;
 
+        --Check availability of the copy for 2 weeks
+        
+
         
 
 
