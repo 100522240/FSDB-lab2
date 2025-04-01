@@ -61,7 +61,7 @@ create or replace package body foundicu as
             from copies
             where signature = l_signature;
 
-            if v_copy_available > 0 then
+            if v_copy_available = 0 then
                 raise_application_error(-20002, 'Copy not available');
             end if;
             
@@ -85,7 +85,7 @@ create or replace package body foundicu as
             from loans
             where user_id = v_user_id and type = 'L' and return is null;
             --If v_loans_count is bigger than 2, raise an error
-            if v_loans_count > 2 then
+            if v_loans_count >  2then
                 raise_application_error(-20004, 'User has reached the loan limit');
             --If the user is banned, raise an error
             elsif v_ban_up2 is not null and v_ban_up2 > sysdate then
@@ -127,10 +127,15 @@ create or replace package body foundicu as
         end insert_loan;
 
     --Complete description of insert_reservation procedure
-    procedure insert_reservation(isbn varchar2,res_date date) is
+    procedure insert_reservation(isbn varchar2, res_date date) is
         --Declaration of local variables
         v_user_counter number;
         v_borrow_count number;
+        v_loans_2_weeks number;
+        v_services date;
+        v_user_town varchar2(50);
+        v_user_province varchar2(50);
+        v_services_counter number;
 
 
         --First insert into a local variable the number of times a user appears in table users
@@ -153,8 +158,34 @@ create or replace package body foundicu as
             raise_application_error(-20008, 'The user has reached the borrow limit');
         end if;
 
-        --Check availability of the copy for 2 weeks
+        --Now check if there are loans for that copy in the span of two weeks from today
+        select count(*) into v_loans
+        from loans
+        where signature = l_signature
+        and type = 'L'
+        and (
+            ((stopdate between res_date and res_date + 14) and (return is null or return > res_date + 14)) or
+            ((stopdate < res_date or stopdate > res_date + 14) and (return is null or return > res_data + 14))
+        );
+            
+        --If the counter returns a value bigger than 0, this means that the book is loaned and will be loaned within the span of 2 weeks
+        if v_loans > 0 then 
+            raise_application_error(-20003, 'Book currently loaned and will be loaned within 2 weeks');
+        end if;
+
+        select town, province into v_user_town, v_user_province
+        from users
+        where user_id = user;
+
         
+
+
+
+
+        --Select the most recent service available for that user
+
+
+
 
         
 
