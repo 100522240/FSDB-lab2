@@ -2,7 +2,7 @@
 create or replace package foundicu as 
     procedure insert_loan(l_signature char);
     procedure insert_reservation(isbn_input varchar2,res_date date);
-    procedure record_books_ret(input_siganture char);
+    procedure record_books_ret(input_signature char);
 
     current_user varchar2(10);
     procedure set_current_user(p_user varchar2);
