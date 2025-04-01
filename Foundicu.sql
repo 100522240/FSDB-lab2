@@ -261,7 +261,7 @@ create or replace package body foundicu as
 
         update loans
         set return = sysdate
-        where signature = in_signature and user_id = current_user;
+        where signature = input_signature and user_id = current_user;
     end record_books_ret;
 
 
