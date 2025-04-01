@@ -34,9 +34,10 @@ CREATE OR REPLACE TRIGGER trg_update_my_loans
 
 
 CREATE OR REPLACE VIEW my_reservations AS
-    SELECT r.reservation_id, r.isbn, r.reserve_date, r.expiry_date
-    FROM Reservations r
-    WHERE r.user_id = foundicu.get_current_user();
+    SELECT *
+    FROM Loans JOIN Copies USING(Loans.signature, Copies.signature)
+    WHERE user_id = foundicu.get_current_user()
+    AND type = "R";
 
 CREATE OR REPLACE TRIGGER trg_manage_my_reservations
     INSTEAD OF INSERT OR UPDATE OR DELETE ON my_reservations
