@@ -117,10 +117,10 @@ create or replace package body foundicu as
                     where town = v_user_town and province = v_user_province and taskdate = trunc(sysdate);
                 end if;
 
-                select into v_hour to_number(to_char(sysdate, 'HH24'))
+                select to_number(to_char(sysdate, 'HH24')) into v_hour 
                 from dual;
 
-                select into v_minutes to_number(to_char(sysdate, 'MI'))
+                select to_number(to_char(sysdate, 'MI')) into v_minutes
                 from dual;
 
                 v_time := v_hour * 60 + v_minutes;
@@ -148,6 +148,7 @@ create or replace package body foundicu as
         v_signature char(5);
         v_time number;
 
+        begin
         --First insert into a local variable the number of times a user appears in table users
         select count(*) into v_user_counter
         from users
@@ -185,7 +186,7 @@ create or replace package body foundicu as
             raise_application_error(-20010, 'There is not a copy with the provided isbn');
         end if;
 
-        select into v_signature signature
+        select signature into v_signature
         from copies
         where isbn = isbn_input;
 
@@ -237,7 +238,7 @@ create or replace package body foundicu as
         v_user_count number;
         v_loans_count number;
         
-        
+        begin
         --Count if user is in users table
         select count(*) into v_user_count
         from users
@@ -245,7 +246,7 @@ create or replace package body foundicu as
 
         --If v_user_count is 0 then raise an error
         if v_user_count = 0 then
-          raise_application_error(-20013, 'Current user not found')
+          raise_application_error(-20013, 'Current user not found');
         end if;
 
         --Check if the user has loaned the book with signature provided
@@ -260,12 +261,13 @@ create or replace package body foundicu as
         update loans
         set return = sysdate
         where signature = in_signature and user_id = current_user;
+        end record_books_ret;
 
 
     -- Replace current user 
     procedure set_current_user(p_user varchar2) is
         begin current_user := p_user; 
-        end set_current_user;
+    end set_current_user;
     
     -- Retrieve current user
     function get_current_user return varchar2 is begin 
