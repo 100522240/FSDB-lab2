@@ -147,6 +147,7 @@ create or replace package body foundicu as
         v_isbn_count number;
         v_signature char(5);
         v_time number;
+        v_loans number;
 
         begin
         --First insert into a local variable the number of times a user appears in table users
@@ -232,7 +233,7 @@ create or replace package body foundicu as
     end insert_reservation;
 
     --Complete description of record books retired procedure
-    procedure record_books_ret(in_signature char) is
+     procedure record_books_ret(in_siganture char) is
         --Declaration of local variables
         v_user_id char(10);
         v_user_count number;
@@ -261,7 +262,7 @@ create or replace package body foundicu as
         update loans
         set return = sysdate
         where signature = in_signature and user_id = current_user;
-        end record_books_ret;
+    end record_books_ret;
 
 
     -- Replace current user 
