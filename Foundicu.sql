@@ -255,7 +255,7 @@ create or replace package body foundicu as
         where signature = in_signature and user_id = current_user;
 
         if v_loans_count = 0 then
-          raise_application_error(-20014, 'There are no loans for the given copy made by the user')
+          raise_application_error(-20014, 'There are no loans for the given copy made by the user');
         end if;
 
         update loans
