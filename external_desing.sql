@@ -39,7 +39,7 @@ CREATE OR REPLACE VIEW my_reservations AS
     l.stopdate,
     l.return,
     l.user_id,
-    c.isbn,
+    c.isbn
 
     FROM loans l
     JOIN copies c on l.signature = c.signature
