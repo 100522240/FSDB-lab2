@@ -32,9 +32,6 @@ BEGIN
 END;
 /
 
-
-
-
 CREATE OR REPLACE VIEW my_reservations AS
     SELECT l.signature, l.stopdate, l.return, l.user_id, c.isbn, l.time, l.type
     FROM loans l
