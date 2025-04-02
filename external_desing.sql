@@ -34,7 +34,13 @@ CREATE OR REPLACE TRIGGER trg_update_my_loans
 
 
 CREATE OR REPLACE VIEW my_reservations AS
-    SELECT *
+    SELECT 
+    l.signature,
+    l.stopdate,
+    l.return,
+    l.user_id,
+    c.isbn,
+
     FROM loans l JOIN Copies c on l.signature = c.signature
     WHERE user_id = foundicu.get_current_user()
     AND l.type = 'R';
