@@ -35,7 +35,7 @@ CREATE OR REPLACE TRIGGER trg_update_my_loans
 
 CREATE OR REPLACE VIEW my_reservations AS
     SELECT *
-    FROM loans j JOIN Copies c on l.signature = c.signature
+    FROM loans l JOIN Copies c on l.signature = c.signature
     WHERE user_id = foundicu.get_current_user()
     AND type = "R";
 
