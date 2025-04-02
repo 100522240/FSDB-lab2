@@ -41,7 +41,7 @@ CREATE OR REPLACE VIEW my_reservations AS
     l.user_id,
     c.isbn,
 
-    FROM loans l JOIN Copies c on l.signature = c.signature
+    FROM loans l JOIN copies c on l.signature = c.signature
     WHERE user_id = foundicu.get_current_user()
     AND l.type = 'R';
 
