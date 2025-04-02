@@ -25,7 +25,7 @@ CREATE OR REPLACE TRIGGER trg_update_my_loans
                 UPDATE SET p.text = :NEW.text, 
                         p.post_date = SYSDATE
             WHEN NOT MATCHED THEN
-                INSERT into posts (singature, text, post_date, likes, dislikes)
+                INSERT into posts (signature, text, post_date, likes, dislikes)
                 VALUES (:NEW.signature, :NEW.text, SYSDATE, 0, 0);
         END IF;
     END;
