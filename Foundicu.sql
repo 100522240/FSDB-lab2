@@ -37,8 +37,6 @@ create or replace package body foundicu as
             select count(*) into v_user_count from users where user_id = current_user;
             if v_user_count = 0 then
                 raise_application_error(-20001, 'Current user not found');
-            else
-                dbms_output.put_line('User found');
             end if;
 
             --Store the id of the user and the banned date (if it exists) in local varaibles

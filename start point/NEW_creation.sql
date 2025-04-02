@@ -213,7 +213,7 @@ TYPE               CHAR(1) NOT NULL,
 TIME               NUMBER(5) default(0) NOT NULL,
 RETURN             DATE,
 CONSTRAINT pk_loans PRIMARY KEY(signature,user_id,stopdate),
-CONSTRAINT fk_loans_users FOREIGN KEY(user_id) REFERENCES users (user_id),
+CONSTRAINT fk_loans_users FOREIGN KEY(user_id) REFERENCES users(user_id),
 CONSTRAINT fk_loans_copies FOREIGN KEY(signature) REFERENCES copies (signature),
 CONSTRAINT fk_loans_services FOREIGN KEY(town,province,stopdate) 
            REFERENCES services (town,province,taskdate),
