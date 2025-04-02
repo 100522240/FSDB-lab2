@@ -75,7 +75,7 @@ CONSTRAINT fk_editions_books FOREIGN KEY(title,author) REFERENCES books(title,au
 
 --
 
-CREATE TABLE Copies(
+CREATE TABLE copies(
 SIGNATURE          CHAR(5),
 ISBN               VARCHAR2(20) NOT NULL,
 CONDITION          CHAR(1) default('G') NOT NULL,

@@ -42,7 +42,7 @@ CREATE OR REPLACE VIEW my_reservations AS
     c.isbn,
 
     FROM loans l JOIN copies c on l.signature = c.signature
-    WHERE l.user_id = foundicu.get_current_user()
+    AND l.user_id = foundicu.get_current_user()
     AND l.type = 'R';
 
 CREATE OR REPLACE TRIGGER trg_manage_my_reservations
