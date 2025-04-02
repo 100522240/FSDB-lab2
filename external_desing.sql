@@ -1,5 +1,5 @@
 CREATE OR REPLACE VIEW my_data AS
-    SELECT user_id, first_name, last_name, address, email, phone
+    SELECT *
     FROM Users
     WHERE user_id = foundicu.get_current_user();
 
@@ -35,7 +35,7 @@ CREATE OR REPLACE TRIGGER trg_update_my_loans
 
 CREATE OR REPLACE VIEW my_reservations AS
     SELECT *
-    FROM Loans JOIN Copies USING(Loans.signature, Copies.signature)
+    FROM loans j JOIN Copies c USING(l.signature, c.signature)
     WHERE user_id = foundicu.get_current_user()
     AND type = "R";
 
