@@ -16,17 +16,17 @@ CREATE OR REPLACE TRIGGER trg_update_my_loans
     INSTEAD OF UPDATE ON my_loans
     FOR EACH ROW
     BEGIN
-        IF :NEW.post_text IS NOT NULL THEN
+        IF :NEW.text IS NOT NULL THEN
             -- Update or insert post
             MERGE INTO Posts p
-            USING (SELECT :NEW.loan_id AS loan_id FROM dual) src
-            ON (p.loan_id = src.loan_id)
+            USING (SELECT :NEW.signature AS signature FROM dual) src
+            ON (p.signature = src.signature)
             WHEN MATCHED THEN
-                UPDATE SET p.post_text = :NEW.post_text, 
+                UPDATE SET p.text = :NEW.text, 
                         p.post_date = SYSDATE
             WHEN NOT MATCHED THEN
-                INSERT (loan_id, post_text, post_date, likes, dislikes)
-                VALUES (:NEW.loan_id, :NEW.post_text, SYSDATE, 0, 0);
+                INSERT into posts (singature, text, post_date, likes, dislikes)
+                VALUES (:NEW.signature, :NEW.text, SYSDATE, 0, 0);
         END IF;
     END;
     /
@@ -37,7 +37,7 @@ CREATE OR REPLACE VIEW my_reservations AS
     SELECT *
     FROM loans l JOIN Copies c on l.signature = c.signature
     WHERE user_id = foundicu.get_current_user()
-    AND type = "R";
+    AND l.type = "R";
 
 CREATE OR REPLACE TRIGGER trg_manage_my_reservations
     INSTEAD OF INSERT OR UPDATE OR DELETE ON my_reservations
@@ -45,16 +45,16 @@ CREATE OR REPLACE TRIGGER trg_manage_my_reservations
     BEGIN
         IF INSERTING THEN
             -- Check book availability before inserting
-            INSERT INTO Reservations (reservation_id, user_id, isbn, reserve_date, expiry_date)
-            VALUES (:NEW.reservation_id, foundicu.get_current_user(), :NEW.isbn, :NEW.reserve_date, :NEW.expiry_date);
+            INSERT INTO loans (signature, user_id, stopdate, time, type, return)
+            VALUES (:NEW.signature, foundicu.get_current_user(), :NEW.stopdate, :NEW.time, :NEW.type, :NEW.return);
         ELSIF UPDATING THEN
             -- Allow date changes only if book is available
-            UPDATE Reservations 
-            SET reserve_date = :NEW.reserve_date, 
-                expiry_date = :NEW.expiry_date
-            WHERE reservation_id = :OLD.reservation_id;
+            UPDATE loans
+            SET stopdate = :NEW.stopdate, 
+                return = :NEW.return
+            WHERE signature = :OLD.signature;
         ELSIF DELETING THEN
-            DELETE FROM Reservations WHERE reservation_id = :OLD.reservation_id;
+            DELETE FROM loan WHERE signature = :OLD.signature;
         END IF;
     END;
     /
