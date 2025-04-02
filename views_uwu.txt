@@ -1,0 +1,69 @@
+CREATE OR REPLACE VIEW my_data AS
+SELECT 
+    user_id,
+    id_card,
+    name,
+    surname1,
+    surname2,
+    birthdate,
+    town,
+    province,
+    address,
+    email,
+    phone,
+    type
+FROM 
+    users
+WHERE 
+    user_id = lib_user.get_current_user()
+WITH READ ONLY;
+
+
+CREATE OR REPLACE VIEW my_loans AS
+SELECT 
+    l.signature,
+    l.user_id,
+    l.stopdate,
+    l.town,
+    l.province,
+    l.type,
+    l.time,
+    l.return,
+    p.post_date,
+    p.text AS post,
+    p.likes,
+    p.dislikes
+FROM 
+    loans l
+LEFT JOIN 
+    posts p ON l.signature = p.signature 
+    AND l.user_id = p.user_id 
+    AND l.stopdate = p.stopdate
+WHERE 
+    l.user_id = lib_user.get_current_user();
+
+
+CREATE OR REPLACE VIEW my_reservations AS
+SELECT 
+    l.signature,
+    l.user_id,
+    e.isbn,
+    b.title,
+    b.author,
+    l.stopdate AS reservation_date,
+    l.return AS expiry_date,
+    s.town,
+    s.province
+FROM 
+    loans l
+JOIN 
+    copies c ON l.signature = c.signature
+JOIN 
+    editions e ON c.isbn = e.isbn
+JOIN 
+    books b ON e.title = b.title AND e.author = b.author
+JOIN
+    services s ON l.town = s.town AND l.province = s.province AND l.stopdate = s.taskdate
+WHERE 
+    l.user_id = lib_user.get_current_user()
+    AND l.return IS NULL;
