@@ -13,28 +13,30 @@ CREATE OR REPLACE VIEW my_loans AS
     WHERE l.user_id = foundicu.get_current_user();
 
 CREATE OR REPLACE TRIGGER trg_update_my_loans
-    INSTEAD OF UPDATE ON my_loans
-    FOR EACH ROW
-    BEGIN
-        IF :NEW.text IS NOT NULL THEN
-            -- Update or insert post
-            MERGE INTO Posts p
-            USING (SELECT :NEW.signature AS signature FROM dual) src
-            ON (p.signature = src.signature)
-            WHEN MATCHED THEN
-                UPDATE SET p.text = :NEW.text, 
-                        p.post_date = SYSDATE
-            WHEN NOT MATCHED THEN
-                INSERT into posts (signature, text, post_date, likes, dislikes)
-                VALUES (:NEW.signature, :NEW.text, SYSDATE, 0, 0);
+INSTEAD OF UPDATE ON my_loans
+FOR EACH ROW
+BEGIN
+    IF :NEW.text IS NOT NULL THEN
+        -- First, try updating the existing post
+        UPDATE Posts
+        SET text = :NEW.text,
+            post_date = SYSDATE
+        WHERE signature = :NEW.signature;
+        
+        -- If no rows were updated, insert a new post
+        IF SQL%ROWCOUNT = 0 THEN
+            INSERT INTO Posts (signature, text, post_date, likes, dislikes)
+            VALUES (:NEW.signature, :NEW.text, SYSDATE, 0, 0);
         END IF;
-    END;
-    /
+    END IF;
+END;
+/
+
 
 
 
 CREATE OR REPLACE VIEW my_reservations AS
-    SELECT l.signature, l.stopdate, l.return, l.user_id, c.isbn
+    SELECT l.signature, l.stopdate, l.return, l.user_id, c.isbn, l.time, l.type
     FROM loans l
     JOIN copies c on l.signature = c.signature
     WHERE l.user_id = foundicu.get_current_user()
@@ -51,11 +53,10 @@ CREATE OR REPLACE TRIGGER trg_manage_my_reservations
         ELSIF UPDATING THEN
             -- Allow date changes only if book is available
             UPDATE loans
-            SET stopdate = :NEW.stopdate, 
-                return = :NEW.return
+            SET stopdate = :NEW.stopdate, return = :NEW.return
             WHERE signature = :OLD.signature;
         ELSIF DELETING THEN
-            DELETE FROM loan WHERE signature = :OLD.signature;
+            DELETE FROM loans WHERE signature = :OLD.signature;
         END IF;
     END;
     /
