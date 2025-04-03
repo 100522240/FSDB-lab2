@@ -44,11 +44,7 @@ create table user_history (
     EMAIL              VARCHAR2(100),
     PHONE              NUMBER(9) NOT NULL,
     TYPE               CHAR(1) NOT NULL,
-    BAN_UP2            DATE,
-CONSTRAINT pk_user_history PRIMARY KEY(user_id),
-CONSTRAINT fk_user_history_municipalities FOREIGN KEY(town,province) 
-           REFERENCES municipalities(town,province),
-CONSTRAINT ck_user_history_phone CHECK (phone>99999999)
+    BAN_UP2            DATE
 );
 
 --Create history table for loans
@@ -60,13 +56,7 @@ create table loan_history (
     PROVINCE           VARCHAR2(22) NOT NULL,
     TYPE               CHAR(1) NOT NULL,
     TIME               NUMBER(5) default(0) NOT NULL,
-    RETURN             DATE,
-CONSTRAINT pk_loans_history PRIMARY KEY(signature,user_id,stopdate),
-CONSTRAINT fk_loans_history_users FOREIGN KEY(user_id) REFERENCES users (user_id),
-CONSTRAINT fk_loans_history_copies FOREIGN KEY(signature) REFERENCES copies (signature),
-CONSTRAINT fk_loans_history_services FOREIGN KEY(town,province,stopdate) 
-           REFERENCES services (town,province,taskdate),
-CONSTRAINT ck_loans_history_dates CHECK (return is null or return>stopdate)
+    RETURN             DATE
 );
 
 --Create trigger for inserting into history tables the data of the user before deleting
@@ -82,7 +72,7 @@ begin
     
     --Insert into loan_history table the loans of the user that is going to be removed
     insert into loan_history (SIGNATURE, USER_ID, STOPDATE, TOWN, PROVINCE, TYPE, TIME, RETURN)
-    select l.signature, l.user_id, l.town, l.province, l.type, l.return, l.time, l.return
+    select l.signature, l.user_id, l.stopdate, l.town, l.province, l.type, l.time, l.return
     from loans l
     where l.user_id = :OLD.user_id;
 

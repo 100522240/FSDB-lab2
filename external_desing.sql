@@ -50,7 +50,7 @@ end;
 /
 
 CREATE OR REPLACE VIEW my_reservations AS
-    SELECT l.signature, l.stopdate, l.return, l.user_id, c.isbn, l.time, l.type
+    SELECT l.signature, l.stopdate, l.return, l.user_id, c.isbn, l.time, l.type, l.town, l.province
     FROM loans l
     JOIN copies c on l.signature = c.signature
     WHERE l.user_id = foundicu.get_current_user()
@@ -62,8 +62,8 @@ CREATE OR REPLACE TRIGGER trg_manage_my_reservations
     BEGIN
         IF INSERTING THEN
             -- Check book availability before inserting
-            INSERT INTO loans (signature, user_id, stopdate, time, type, return)
-            VALUES (:NEW.signature, foundicu.get_current_user(), :NEW.stopdate, :NEW.time, :NEW.type, :NEW.return);
+            INSERT INTO loans (signature, user_id, stopdate, town, province, time, type, return)
+            VALUES (:NEW.signature, foundicu.get_current_user(), :NEW.stopdate, :NEW.town, :NEW.province, :NEW.time, :NEW.type, :NEW.return);
         ELSIF UPDATING THEN
             -- Allow date changes only if book is available
             UPDATE loans

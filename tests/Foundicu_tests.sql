@@ -4,6 +4,7 @@ exec foundicu.set_current_user(user);
 exec foundicu.insert_loan('RI645');
 
 --Now provide a valid user. For that, we will create first a new user
+alter trigger trg_insert_history_tables disable;
 alter table users disable constraint fk_users_municipalities;
 insert into users(user_id, id_card, name, surname1, surname2, birthdate, town, province, address, type, phone) 
 values('USER100235', 'ESPA-768594032652', 'Jose Maria', 'Gutierrez', 'Hernandez', to_date('29-MAR-1989', 'DD-MON-YYYY'), 'Valdepeñas del Iregua', 'Soria', 'Avenida del Pepino, 17', 'L', 678678999);
@@ -73,7 +74,6 @@ insert into services(town, province, bus, taskdate, passport) values ('Valdepeñ
 exec foundicu.insert_loan('SIGN1');
 
 --After all the tests for the first procedure have been performed, delete all the rows added and re-enable the constraints
-alter trigger trg_insert_history_tables disable;
 delete from loans where signature = 'SIGN1';
 delete from services where town = 'Valdepeñas del Iregua';
 delete from users where user_id = 'USER100235';
