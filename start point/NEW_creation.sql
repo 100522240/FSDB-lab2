@@ -235,6 +235,3 @@ CONSTRAINT fk_posts_loans FOREIGN KEY(signature,user_id,stopdate)
            REFERENCES loans (signature,user_id,stopdate) ON DELETE CASCADE,
 CONSTRAINT ck_posts_dates CHECK (stopdate<post_date)
 );
-
-
-

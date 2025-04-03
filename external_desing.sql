@@ -1,13 +1,14 @@
 CREATE OR REPLACE VIEW my_data AS
     SELECT *
     FROM Users
-    WHERE user_id = foundicu.get_current_user();
+    WHERE user_id = foundicu.get_current_user()
+    with read only;
 
 
 
 CREATE OR REPLACE VIEW my_loans AS
-    SELECT l.signature, l.stopdate, l.return, 
-        p.text, p.post_date, p.likes, p.dislikes
+    SELECT distinct l.signature, l.stopdate, l.return, 
+        p.post_date, p.likes, p.dislikes, p.text
     FROM Loans l
     LEFT JOIN Posts p ON l.user_id = p.user_id
     WHERE l.user_id = foundicu.get_current_user();
@@ -25,11 +26,27 @@ BEGIN
         
         -- If no rows were updated, insert a new post
         IF SQL%ROWCOUNT = 0 THEN
-            INSERT INTO Posts (signature, text, post_date, likes, dislikes)
-            VALUES (:NEW.signature, :NEW.text, SYSDATE, 0, 0);
+            INSERT INTO Posts (user_id, signature, text, stopdate, post_date, likes, dislikes)
+            VALUES (foundicu.get_current_user, :NEW.signature, :NEW.text, :OLD.stopdate, SYSDATE, 0, 0);
         END IF;
     END IF;
 END;
+/
+
+create or replace trigger trg_cancel_insertion
+instead of insert on my_loans
+for each row
+begin
+    raise_application_error(-20052, 'User cannot insert into views');
+end;
+/
+
+create or replace trigger trg_cancel_deletion
+instead of delete on my_loans
+for each row
+begin
+    raise_application_error(-20080, 'User cannot delete from the view');
+end;
 /
 
 CREATE OR REPLACE VIEW my_reservations AS

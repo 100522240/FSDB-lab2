@@ -63,14 +63,14 @@ create or replace package body foundicu as
                 from copies
                 where signature = l_signature;
 
-            if v_copy_available = 0 then
-                raise_application_error(-20002, 'Copy not available');
-            end if;
+                if v_copy_available = 0 then
+                    raise_application_error(-20002, 'Copy not available');
+                end if;
             
                 --Now check if there are loans for that copy in the span of two weeks from today
                 select count(*) into v_loans
                 from loans
-                where signature = l_signature
+                where signature = l_signature and user_id != v_user_id
                 and type = 'L'
                 and (
                     ((stopdate between trunc(sysdate) and trunc(sysdate) + 14) and (return is null)) or
@@ -192,7 +192,7 @@ create or replace package body foundicu as
         --Now check if there are loans for that copy in the span of two weeks from the input date
         select count(*) into v_loans
         from loans
-        where signature = v_signature
+        where signature = v_signature and user_id != v_user_id
         and type = 'L'
         and (
             ((stopdate between res_date - 14 and res_date + 14) and (return is null)) or
@@ -206,7 +206,7 @@ create or replace package body foundicu as
 
         select town, province into v_user_town, v_user_province
         from users
-        where user_id = user;
+        where user_id = current_user;
 
         --Select the most recent service available for that user
         select count(*) into v_services_counter
@@ -279,5 +279,3 @@ create or replace package body foundicu as
     end get_current_user;
 end foundicu;
 /
-
-
