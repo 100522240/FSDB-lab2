@@ -32,7 +32,6 @@ delete from copies where signature = 'SIGN1';
 alter table copies enable constraint fk_copies_editions;
 
 /*Check that before deleting a user, his/her data and all the loans assigned to that person are stored in the history tables*/
---0488743850 ESP>>340488743850 Gerardo Oscar                                                                    Gomez                                                                                                                                                             24-AUG-77 Villanieves                                        León                   Road Santa Ines 90, 69742                                                                           , Villanieves                                                                                                                                            555202308 P
 delete from users where user_id = '0488743850';
 
 select * from user_history;

@@ -21,6 +21,9 @@ insert into loans(signature, user_id, stopdate, town, province, type, time) valu
 
 exec foundicu.insert_loan('SIGN1');
 
+--Check that it has worked fine
+select * from loans where signature = 'SIGN1';
+
 --Delete the inserted loan for making easier the next steps
 delete from loans where signature = 'SIGN1';
 
@@ -72,6 +75,8 @@ alter table services disable constraint fk_services_asgn_drv;
 insert into services(town, province, bus, taskdate, passport) values ('Valdepeñas del Iregua', 'Soria', 'BUS00123', trunc(sysdate), 'XDXDXD-1287942687');
 
 exec foundicu.insert_loan('SIGN1');
+
+select * from loans where signature = 'SIGN1';
 
 --After all the tests for the first procedure have been performed, delete all the rows added and re-enable the constraints
 delete from loans where signature = 'SIGN1';
@@ -126,7 +131,8 @@ where user_id = 'USER100235';
 
 --Test when there is not a copy of the input isbn
 exec foundicu.insert_reservation('ISBN-01', trunc(sysdate));
---Insert a copy with the isbn valid
+
+--Insert a copy with the isbn valid but all the loans are reserved and will not be available in 2 weeks
 alter table copies disable constraint fk_copies_editions;
 alter table copies disable constraint ck_condition;
 
@@ -154,6 +160,8 @@ insert into services(town, province, bus, taskdate, passport) values ('Valdepeñ
 insert into services(town, province, bus, taskdate, passport) values ('Valdepeñas del Iregua', 'Soria', 'BUS00123', to_date('10-APR-2025', 'DD-MON-YYYY'), 'XDXDXD-1287942687');
 
 exec foundicu.insert_reservation('ISBN-0001', trunc(sysdate));
+
+select * from loans where signature = 'SIGN1';
 
 --Delete all the data introduced for testing and re-enable the trigger
 delete from loans where signature = 'SIGN1';
@@ -194,6 +202,8 @@ alter table loans disable constraint fk_loans_services;
 insert into loans(signature, user_id, stopdate, town, province, type, time) values('SIGN1', 'USER100235', to_date('01-MAR-2025', 'DD-MON-YYYY'), 'Valdepeñas del Iregua', 'Soria', 'L', 0);
 
 exec foundicu.record_books_ret('SIGN1');
+
+select * from loans where signature = 'SIGN1';
 
 --Delete all the data introduced for testing
 delete from loans where signature = 'SIGN1';
